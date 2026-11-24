@@ -1216,6 +1216,24 @@
     submitBtn.textContent = 'Sending...';
     if (errorMsg) errorMsg.style.display = 'none';
 
+    // Instant email alert to the listing agent (runs alongside the Firebase save; failures don't affect the lead being saved)
+    try {
+      fetch('https://formsubmit.co/ajax/vineet.v.sharma@gmail.com', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        body: JSON.stringify({
+          _subject: 'New Courtyard lead: ' + name,
+          _template: 'table',
+          _captcha: 'false',
+          Name: name,
+          Phone: phone,
+          Email: email,
+          Project: 'The Courtyard at Signal Hill',
+          Submitted: new Date().toLocaleString('en-US', {timeZone: 'America/Los_Angeles'}) + ' PT'
+        })
+      }).catch(function(err){ console.warn('Email alert failed:', err); });
+    } catch (err) { console.warn('Email alert error:', err); }
+
     db.collection('leads').add({
       name: name,
       phone: phone,
